@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <title>Match</title>
+  <style>
+    body { font-family: "Segoe UI", sans-serif; text-align: center; background: linear-gradient(135deg, #94B4C1, #dfe9ff); margin: 0; padding: 20px; }
+    h1 { font-size: 2.5rem; color: #213448;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+    #game { 
+      display: grid; 
+      grid-template-columns: repeat(4, 140px); 
+      gap: 15px; 
+      justify-content: center; 
+      margin-top: 30px; 
+    }
+    .card { 
+      width: 140px; 
+      height: 140px; 
+      background: #547792; 
+      color: #EAE0CF; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      border-radius: 15px; 
+      cursor: pointer; 
+      font-size: 1.1rem; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.50);
+      transition: transform 0.2s, background 0.3s;
+    }
+    .card:hover { transform: scale(1.08); }
+    .flipped { 
+      background: #EAE0CF; 
+      color: #222; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Formel-Match</h1>
+  <p>Match formel og navn!</p>
+
+  <div id="game"></div>
+
+  <script>
+    const pairs = {
+      "Sølvnitrat": "AgNO₃",
+      "Vand": "H₂O",
+      "Glukose": "C₆H₁₂O₆",
+      "Kuldioxid": "CO₂",
+      "Saltsyre": "NCL",
+      "Svovlsyre": "H₂SO₄",
+      "Kaliumnitrat": "KNO₃",
+      "Eddikesyre": "CH₃COOH",
+          };
+
+    let cards = [];
+    for (let key in pairs) {
+      cards.push({ text: key, match: pairs[key] });
+      cards.push({ text: pairs[key], match: key });
+    }
+
+    cards = cards.sort(() => Math.random() - 0.5);
+
+    const game = document.getElementById("game");
+
+    let flipped = [];
+    let lock = false;
+
+    cards.forEach((c, i) => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.dataset.index = i;
+      div.textContent = "?";
+      game.appendChild(div);
+    });
+
+    game.onclick = (e) => {
+      const card = e.target;
+      if (!card.classList.contains("card") || lock) return;
+      const index = card.dataset.index;
+      const data = cards[index];
+
+      if (card.classList.contains("flipped")) return;
+
+      card.classList.add("flipped");
+      card.textContent = data.text;
+
+      flipped.push(card);
+
+      if (flipped.length === 2) {
+        lock = true;
+        const [c1, c2] = flipped;
+        const d1 = cards[c1.dataset.index];
+        const d2 = cards[c2.dataset.index];
+
+        if (d1.match === d2.text || d2.match === d1.text) {
+          setTimeout(() => {
+            c1.style.visibility = "hidden";
+            c2.style.visibility = "hidden";
+            flipped = [];
+            lock = false;
+          }, 700);
+        } else {
+          setTimeout(() => {
+            c1.classList.remove("flipped");
+            c2.classList.remove("flipped");
+            c1.textContent = "?";
+            c2.textContent = "?";
+            flipped = [];
+            lock = false;
+          }, 1000);
+        }
+      }
+    };
+  </script>
+</body>
+</html>
